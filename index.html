@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Poppins&display=swap" rel="stylesheet" />
+    <link href="./css/main.css" rel="stylesheet" />
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="mainContainer">
+
+        <div class="topHalf"></div>
+
+        <span class="largeTitle">Select a language</span>
+
+        <span class="smallerTitle">Please select one</span>
+
+        <div class="v0_34">
+            <div class="v0_35"></div>
+
+        </div>
+
+        <span class="v0_36">Back</span>
+
+        <div class="cardsHorizontalContainer">
+            <div class="cardContainer">
+                <div class="card" style="background-color: rgba(214,153,42,1);"></div>
+                <div class="japaneseImg"></div>
+                <span class="cardText" style="left: 22px; ">Japanese</span>
+            </div>
+            <div class="cardContainer" style="left: 140px;">
+                <div class="card"></div>
+                <div class="englishImg"></div>
+                <span class="cardText" style="left: 37px;">English</span>
+            </div>
+            <div class="cardContainer" style="left: 280px;">
+                <div class="card"></div>
+                <div class="koreanImg"></div>
+                <span class="cardText" style="left: 35px;">Korean</span>
+            </div>
+            <div class="cardContainer" style="left: 420px;">
+                <div class="card"></div>
+                <div class="chineseImg"></div>
+                <span class="cardText">Chinese</span>
+            </div>
+        </div>
+
+
+
+        <button id="openModalBtn" class="openModalBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" viewBox="0 0 24 24" height="36" fill="none"
+                class="svg-icon">
+                <g stroke-width="2" stroke-linecap="round" stroke="#ffffff">
+                    <rect y="3" x="9" width="6" rx="3" height="11" />
+                    <path d="m12 18v3"></path>
+                    <path d="m8 21h8" />
+                    <path d="m19 11c0 3.866-3.134 7-7 7-3.86599 0-7-3.134-7-7" />
+                </g>
+            </svg>
+        </button>
+
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <span id="closeModalBtn" class="close">&times;</span> <!-- Close icon -->
+
+                <div id="timerCircle" class="timer-circle">
+                    <div id="timerSpin" class="timer-spin"></div>
+                    <span id="timerDisplay" class="timer-display">00:00</span>
+                </div>
+                <p id="modalText" class="modalText">Tap button to start Recording in Japanese</p>
+
+                <button id="startTimerBtn" class="startTimerBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="36" viewBox="0 0 24 24" height="36" fill="none"
+                        class="svg-icon">
+                        <g stroke-width="2" stroke-linecap="round" stroke="#ffffff">
+                            <rect y="3" x="9" width="6" rx="3" height="11" />
+                            <path d="m12 18v3"></path>
+                            <path d="m8 21h8" />
+                            <path d="m19 11c0 3.866-3.134 7-7 7-3.86599 0-7-3.134-7-7" />
+                        </g>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        // Get all cards
+        var cards = document.getElementsByClassName("card");
+        var modalText = document.getElementById("modalText");
+
+        // Initialize clickedCard
+        var clickedCard = cards[0];
+        // Add click event listener to each card
+        for (var i = 0; i < cards.length; i++) {
+            cards[i].addEventListener("click", function () {
+                // Deselect previously selected card
+                if (clickedCard) {
+                    clickedCard.style.backgroundColor = "rgba(255,255,255,1)"; // Change this to the original background color
+                }
+
+                // Select new card
+                this.style.backgroundColor = "rgba(214,153,42,1)";
+                clickedCard = this;
+                var cardText = this.nextElementSibling.nextElementSibling.textContent;
+
+                // Set the text in the modal
+                modalText.textContent = "Tap button to start Recording in "+cardText;
+
+            });
+        }
+
+        // Get the elements
+        var modal = document.getElementById("myModal");
+        var btn = document.getElementById("openModalBtn");
+        var span = document.getElementById("closeModalBtn");
+        var timerDisplay = document.getElementById("timerDisplay");
+        var startTimerBtn = document.getElementById("startTimerBtn");
+        var timerCircle = document.getElementById("timerCircle");
+        var timerSpin = document.getElementById("timerSpin");
+
+        // Initialize timer state
+        var timerRunning = false;
+        var timerInterval;
+
+        // When the user clicks the button, open the modal 
+        btn.onclick = function () {
+            modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+            stopTimer();
+            resetTimer();
+        }
+
+        startTimerBtn.onclick = function () {
+            if (timerRunning) {
+                stopTimer();
+            } else {
+                startTimer();
+            }
+        }
+
+        function startTimer() {
+            var totalSeconds = 0;
+
+            // Change background and start spinning animation
+            timerCircle.style.backgroundColor = "transparent";
+            timerSpin.style.animation = "spin 2s linear infinite";
+
+            // Start timer
+            timerRunning = true;
+
+            startTimerBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" viewBox="0 0 24 24" height="36" fill="none" class="svg-icon">
+            <g stroke-width="2" stroke-linecap="round" stroke="#ffffff">
+                <rect x="7" y="5" width="10" height="14" />
+                <rect x="7" y="5" width="10" height="14" />
+            </g>
+        </svg>
+    `;
+            timerInterval = setInterval(function () {
+                ++totalSeconds;
+                var minutes = Math.floor(totalSeconds / 60);
+                var seconds = totalSeconds % 60;
+                timerDisplay.textContent = formatTime(minutes) + ":" + formatTime(seconds);
+            }, 1000);
+        }
+
+        function stopTimer() {
+            // Stop spinning animation
+            timerSpin.style.animation = "none";
+
+            // Stop timer
+            timerRunning = false;
+            startTimerBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" viewBox="0 0 24 24" height="36" fill="none" class="svg-icon">
+            <g stroke-width="2" stroke-linecap="round" stroke="#ffffff">
+                <rect y="3" x="9" width="6" rx="3" height="11" />
+                <path d="m12 18v3"></path>
+                <path d="m8 21h8" />
+                <path d="m19 11c0 3.866-3.134 7-7 7-3.86599 0-7-3.134-7-7" />
+            </g>
+        </svg>
+    `; clearInterval(timerInterval);
+        }
+
+        function resetTimer() {
+            // Reset timer display and background
+            timerDisplay.textContent = "00:00";
+            timerCircle.style.backgroundColor = "initial";
+        }
+
+        function formatTime(time) {
+            return (time < 10 ? "0" : "") + time;
+        }
+
+
+
+    </script>
+
+    </div>
+</body>
+
+</html>
